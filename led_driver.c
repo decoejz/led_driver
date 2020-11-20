@@ -164,10 +164,11 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    *
    *  
    * Receber o buffer no estilo (Nxrgb) -> sendo:
-   * x - led que deve ser acesso - valores de 0 a 255
-   * r - red
-   * g - green
-   * b - blue
+   * N - Char indicador de novo led a ser acessado - valor fixo N mesmo
+   * x - led que deve ser acessado - valores de 0 a 255
+   * r - red - valores de 0 a 255
+   * g - green - valores de 0 a 255
+   * b - blue - valores de 0 a 255
    * 
    * Processar os dados recebidos e enviar para a memoria no local certo,
    * ja baseado no local que inicia (LED_PIO_BASE)
