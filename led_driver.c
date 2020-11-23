@@ -20,12 +20,13 @@
 #include <linux/fs.h>             // Header for the Linux file system support
 #include <linux/uaccess.h>          // Required for the copy to user function
 #include <linux/slab.h>
+#include <string.h>
 
 #define  DEVICE_NAME "ebbchar"    ///< The device will appear at /dev/ebbchar using this value
 #define  CLASS_NAME  "ebb"        ///< The device class -- this is a character device driver
 
 #define LED_PIO_BASE 0X000
-#define LED_PIO_WIDTH 256
+#define LED_PIO_SPAN 256
 
 MODULE_LICENSE("GPL");            ///< The license type -- this affects available functionality
 MODULE_AUTHOR("Derek Molloy");    ///< The author -- visible when you use modinfo
@@ -44,6 +45,9 @@ static int     dev_open(struct inode *, struct file *);
 static int     dev_release(struct inode *, struct file *);
 static ssize_t dev_read(struct file *, char *, size_t, loff_t *);
 static ssize_t dev_write(struct file *, const char *, size_t, loff_t *);
+
+// Variavel estatica indicando o local do led
+static int *p_led = NULL;
 
 /** @brief Devices are represented as file structure in the kernel. The file_operations structure from
 *  /linux/fs.h lists the callback functions that you wish to associated with your file operations
@@ -98,6 +102,8 @@ static int __init ebbchar_init(void){
       printk(KERN_INFO "Failed to allocate mem \n");
       return PTR_ERR(message);
   }
+
+  p_led = ioremap_nocache(ALT_LWFPGASLVS_OFST + LED_PIO_BASE, LED_PIO_SPAN);
 
   printk(KERN_INFO "EBBChar: device class created correctly\n"); // Made it! device was initialized
   return 0;
@@ -182,9 +188,34 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    * alt_setbits_word( ( virtual_base + ( ( uint32_t )( ALT_GPIO1_SWPORTA_DR_ADDR ) & ( uint32_t )( HW_REGS_MASK ) ) ), BIT_LED );
    * 
    */
+
+  if (len < 5) {
+    printk(KERN_INFO "EBBChar: Received unsuficient characters. Received: %zu characters from the user\n", len);
+    return len;
+  }
+
   copy_from_user(message, buffer, len);
-  size_of_message = len;                 // store the length of the stored message
-  printk(KERN_INFO "EBBChar: Received %zu characters from the user\n", len);
+
+  if (!strcmp(message[0], "N")) {
+    size_of_message = len;                 // store the length of the stored message
+
+    unsigned int color = 0;
+
+    color |= message[3];
+    color <<= 8;
+    color |= message[2];
+    color <<= 8;
+    color |= message[4];
+
+    // Enviar a mensagem no formato grb
+    iowrite32(color, p_led + message[1]);  // corsi: write to LED
+
+    printk(KERN_INFO "EBBChar: wrote on led. Received: %zu characters from the user\n", len);
+    return len;
+  }
+
+  printk(KERN_INFO "EBBChar: wrong init of package. Received: %s\n", message[0]);
+
   return len;
 }
 
