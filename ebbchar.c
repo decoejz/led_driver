@@ -20,13 +20,15 @@
 #include <linux/fs.h>             // Header for the Linux file system support
 #include <linux/uaccess.h>          // Required for the copy to user function
 #include <linux/slab.h>
-#include <string.h>
+#include <asm/io.h>
+
 
 #define  DEVICE_NAME "ebbchar"    ///< The device will appear at /dev/ebbchar using this value
 #define  CLASS_NAME  "ebb"        ///< The device class -- this is a character device driver
 
 #define LED_PIO_BASE 0X000
 #define LED_PIO_SPAN 256
+#define ALT_LWFPGASLVS_OFST        0xff200000
 
 MODULE_LICENSE("GPL");            ///< The license type -- this affects available functionality
 MODULE_AUTHOR("Derek Molloy");    ///< The author -- visible when you use modinfo
@@ -196,7 +198,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
 
   copy_from_user(message, buffer, len);
 
-  if (!strcmp(message[0], "N")) {
+  if (message[0] == 'N') {
     size_of_message = len;                 // store the length of the stored message
 
     unsigned int color = 0;
