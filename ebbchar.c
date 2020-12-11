@@ -168,8 +168,6 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 */
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
   /**
-   * Isso funcionaria??
-   *
    *  
    * Receber o buffer no estilo (Nxrgb) -> sendo:
    * N - Char indicador de novo led a ser acessado - valor fixo N mesmo

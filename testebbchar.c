@@ -36,34 +36,13 @@ int main(){
 	for (int i = 0 ; i < 3 ; i++)
 		printf("%x\n", color[i]);   
 
-  /*while(1){
-      printf("Type in a short string to send to the kernel module:\n");
-     
-      printf("Writing message to the device [%s].\n", stringToSend);*/
-
-      //ret = write(fd, b, 5); // Send the string to the LKM
-   /*   if (ret < 0){
-          perror("Failed to write the message to the device.");
-          return errno;
-      }*/
-
-      //printf("Press ENTER to read back from the device...\n");
-      //getchar();
-
-      /*printf("Reading from the device...\n");
-      ret = read(fd, receive, BUFFER_LENGTH);        // Read the response from the LKM
-      if (ret < 0){
-          perror("Failed to read the message fm the device.");
-          return errno;
-      }
-      printf("The received message is: [%s]\n", receive);*/
   int j = 25;
   for (int i = 0; i<10; i++) {
-	b[1] = i;
-	b[2] = color[0];
-	b[3] = color[1];
-	b[4] = color[2];
-	ret = write(fd, b, 5);
+    b[1] = i;
+    b[2] = color[0];
+    b[3] = color[1];
+    b[4] = color[2];
+    ret = write(fd, b, 5);
   }
 
   printf("End of the program\n");
