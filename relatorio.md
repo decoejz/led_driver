@@ -1,4 +1,4 @@
-# Driver linux para acender
+# Driver linux para acender leds
 
 - **Alunos:** André Ejzenmesser e Paulo Tozzo
 - **Curso:** Engenharia da Computação
